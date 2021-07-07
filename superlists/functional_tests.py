@@ -11,6 +11,11 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def assertRowTextInListTable(self, row_text):
+        table = self.browser.find_element_by_id("id_list_table")
+        rows = table.find_elements_by_tag_name("tr")
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_start_list_retrieve_later(self):
         self.browser.get("http://localhost:8000")
         self.assertIn("To-Do", self.browser.title)
@@ -26,9 +31,15 @@ class NewVisitorTest(unittest.TestCase):
         new_item_input.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = self.browser.find_element_by_id("id_list_table")
-        rows = table.find_elements_by_tag_name("tr")
-        self.assertIn("1: Buy peacock feathers", [row.text for row in rows])
+        self.assertRowTextInListTable("1: Buy peacock feathers")
+
+        new_item_input = self.browser.find_element_by_id("new_item_input")
+        new_item_input.send_keys("Use peacock feathers to make a fly")
+        new_item_input.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        self.assertRowTextInListTable("1: Buy peacock feathers")
+        self.assertRowTextInListTable("2: Use peacock feathers to make a fly")
 
         self.fail("Add more tests")
 
