@@ -7,10 +7,6 @@ class HomePageTest(TestCase):
         response = self.client.get("/")
         self.assertTemplateUsed(response, "home.html")
 
-    def test_only_save_items_when_necessary(self):
-        self.client.get("/")
-        self.assertEqual(Item.objects.count(), 0)
-
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -35,7 +31,7 @@ class ListViewTest(TestCase):
     def test_uses_list_template(self):
         response = self.client.get("/lists/the-only-list/")
         self.assertTemplateUsed(response, "list.html")
-    
+
     def test_displays_all_items(self):
         Item.objects.create(text="Item One")
         Item.objects.create(text="Item Two")
@@ -53,6 +49,4 @@ class NewListTest(TestCase):
 
     def test_redirects_after_POST(self):
         response = self.client.post("/lists/new", data={"item_text": "A new list item"})
-        self.assertRedirects(response, "/lists/the-only-list")
-
-    
+        self.assertRedirects(response, "/lists/the-only-list/")
