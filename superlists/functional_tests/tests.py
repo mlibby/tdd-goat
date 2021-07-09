@@ -70,7 +70,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # new visitor creates new list
         new_item_input = self.browser.find_element_by_id("new_item_input")
-        new_item_input.send_keys("But milk")
+        new_item_input.send_keys("Buy milk")
         new_item_input.send_keys(Keys.ENTER)
         self.assertRowTextInListTable("1: Buy milk")
 
