@@ -1,4 +1,4 @@
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
@@ -7,7 +7,7 @@ import time
 MAX_WAIT = 3
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
 
@@ -35,26 +35,26 @@ class NewVisitorTest(LiveServerTestCase):
 
         new_item_label = self.browser.find_element_by_id("new_item_label")
         self.assertEqual(new_item_label.text, "Enter a to-do item")
-        self.assertEqual(new_item_label.get_attribute("for"), "new_item_input")
+        self.assertEqual(new_item_label.get_attribute("for"), "new_item")
 
-        new_item_input = self.browser.find_element_by_id("new_item_input")
-        new_item_input.send_keys("Buy peacock feathers")
-        new_item_input.send_keys(Keys.ENTER)
+        new_item = self.browser.find_element_by_id("new_item")
+        new_item.send_keys("Buy peacock feathers")
+        new_item.send_keys(Keys.ENTER)
 
         self.assertRowTextInListTable("1: Buy peacock feathers")
 
-        new_item_input = self.browser.find_element_by_id("new_item_input")
-        new_item_input.send_keys("Use peacock feathers to make a fly")
-        new_item_input.send_keys(Keys.ENTER)
+        new_item = self.browser.find_element_by_id("new_item")
+        new_item.send_keys("Use peacock feathers to make a fly")
+        new_item.send_keys(Keys.ENTER)
 
         self.assertRowTextInListTable("1: Buy peacock feathers")
         self.assertRowTextInListTable("2: Use peacock feathers to make a fly")
 
     def test_multiple_users_can_start_lists(self):
         self.browser.get(self.live_server_url)
-        new_item_input = self.browser.find_element_by_id("new_item_input")
-        new_item_input.send_keys("Buy peacock feathers")
-        new_item_input.send_keys(Keys.ENTER)
+        new_item = self.browser.find_element_by_id("new_item")
+        new_item.send_keys("Buy peacock feathers")
+        new_item.send_keys(Keys.ENTER)
         self.assertRowTextInListTable("1: Buy peacock feathers")
 
         edith_list_url = self.browser.current_url
@@ -69,9 +69,9 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotIn("make a fly", page_text)
 
         # new visitor creates new list
-        new_item_input = self.browser.find_element_by_id("new_item_input")
-        new_item_input.send_keys("Buy milk")
-        new_item_input.send_keys(Keys.ENTER)
+        new_item = self.browser.find_element_by_id("new_item")
+        new_item.send_keys("Buy milk")
+        new_item.send_keys(Keys.ENTER)
         self.assertRowTextInListTable("1: Buy milk")
 
         # new visitor has own list
@@ -81,3 +81,12 @@ class NewVisitorTest(LiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name("body").text
         self.assertNotIn("Buy peacock feathers", page_text)
         self.assertIn("Buy milk", page_text)
+
+    def test_layout_and_styling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        new_item = self.browser.find_element_by_id("new_item")
+        self.assertAlmostEqual(
+            new_item.location["x"] + new_item.size["width"] / 2, 512, delta=10
+        )
